@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'QuizMaster') - Hệ thống trắc nghiệm thông minh</title>
+    <title>@yield('title', 'Brainova') - Hệ thống trắc nghiệm thông minh</title>
     
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -159,41 +159,76 @@
 <body>
 
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light navbar-custom fixed-top">
-        <div class="container-fluid">
-            <a class="navbar-brand navbar-brand-custom" href="{{ route('dashboard') }}">
-                <i class="fa-solid fa-graduation-cap"></i> QuizMaster
-            </a>
-            <button class="navbar-toggler border-0" type="button" onclick="document.querySelector('.sidebar').classList.toggle('show')">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    @auth
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle font-medium text-dark" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="fa-regular fa-user me-2"></i> {{ Auth::user()->name }} 
-                                <span class="badge bg-secondary ms-1">{{ Auth::user()->role === 'teacher' ? 'Giáo Viên' : 'Học Sinh' }}</span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow">
-                                <li>
-                                    <form action="{{ route('logout') }}" method="POST" id="logout-form">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item text-danger">
-                                            <i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Đăng xuất
-                                        </button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </li>
-                    @else
-                        <li class="nav-item"><a class="nav-link" href="{{ route('login') }}">Đăng nhập</a></li>
-                        <li class="nav-item"><a class="btn btn-gradient btn-sm ms-2 px-3" href="{{ route('register') }}">Đăng ký</a></li>
-                    @endauth
-                </ul>
+    <nav class="navbar navbar-expand-lg bg-white border-bottom shadow-sm fixed-top py-2">
+    <div class="container-fluid px-md-4">
+        
+        <a class="navbar-brand d-flex align-items-center gap-2 fw-bold text-primary fs-4" href="{{ route('dashboard') }}">
+            <div class="bg-primary-subtle text-primary p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                <i class="fa-solid fa-graduation-cap"></i>
             </div>
+            <span>Brainova</span>
+        </a>
+
+        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" onclick="document.querySelector('.sidebar').classList.toggle('show')">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center gap-3">
+                @auth
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2 text-dark border rounded-pill py-1 px-2 shadow-sm bg-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 14px;">
+                                {{ substr(Auth::user()->name, 0, 1) }}
+                            </div>
+                            
+                            <div class="d-none d-sm-block text-start me-1">
+                                <div class="fw-medium lh-1" style="font-size: 14px;">{{ Auth::user()->name }}</div>
+                                <small class="text-muted" style="font-size: 11px;">
+                                    {{ Auth::user()->role === 'teacher' ? 'Giáo Viên' : 'Học Sinh' }}
+                                </small>
+                            </div>
+                        </a>
+                        
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow rounded-4 mt-3 py-2">
+                            <li class="px-3 py-2 d-sm-none border-bottom mb-2">
+                                <span class="fw-bold d-block text-dark">{{ Auth::user()->name }}</span>
+                                <span class="badge bg-primary-subtle text-primary">{{ Auth::user()->role === 'teacher' ? 'Giáo Viên' : 'Học Sinh' }}</span>
+                            </li>
+                            
+                            <li>
+                                <a class="dropdown-item py-2 d-flex align-items-center gap-2 text-secondary" href="{{ route('profile.show') }}">
+                                    <i class="fa-regular fa-user"></i> Hồ sơ cá nhân
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form action="{{ route('logout') }}" method="POST" id="logout-form">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item py-2 text-danger d-flex align-items-center gap-2 fw-medium">
+                                        <i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                @else
+                    <li class="nav-item">
+                        <a class="nav-link fw-medium text-secondary" href="{{ route('login') }}">
+                            Đăng nhập
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-primary rounded-pill px-4 py-2 fw-medium shadow-sm d-flex align-items-center gap-2" href="{{ route('register') }}">
+                            <i class="fa-solid fa-user-plus"></i> Đăng ký ngay
+                        </a>
+                    </li>
+                @endauth
+            </ul>
         </div>
-    </nav>
+    </div>
+</nav>
 
     <!-- App Container -->
     <div class="app-container">
@@ -211,7 +246,7 @@
                                 <i class="fa-solid fa-book-open"></i> Quản lý Quiz
                             </a>
                             <a href="{{ route('documents.index') }}" class="sidebar-link {{ request()->routeIs('documents.*') ? 'active' : '' }}">
-                                <i class="fa-solid fa-file-lines"></i> Tài liệu RAG
+                                <i class="fa-solid fa-file-lines"></i> Tài liệu
                             </a>
                             <a href="{{ route('ai.generate.form') }}" class="sidebar-link {{ request()->routeIs('ai.*') ? 'active' : '' }}">
                                 <i class="fa-solid fa-wand-magic-sparkles"></i> AI Question Generator
@@ -255,7 +290,7 @@
     <!-- Footer -->
     <footer>
         <div class="container">
-            <p class="mb-0">&copy; {{ date('Y') }} QuizMaster App. Được xây dựng chuẩn MVC, Service Pattern & RAG Agent.</p>
+            <p class="mb-0">&copy; {{ date('Y') }} Brainova App.</p>
         </div>
     </footer>
 

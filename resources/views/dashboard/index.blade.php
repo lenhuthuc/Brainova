@@ -48,7 +48,7 @@
             <div class="card card-custom p-4 shadow-sm border-start border-warning border-4 card-hover">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="text-muted fw-semibold">Tài Liệu RAG</h6>
+                        <h6 class="text-muted fw-semibold">Tài Liệu</h6>
                         <h3 class="fw-bold mb-0 text-dark">{{ $documentCount }}</h3>
                     </div>
                     <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-circle">
@@ -85,7 +85,7 @@
                         <i class="fa-solid fa-file-upload me-2"></i> Tải lên tài liệu giảng dạy
                     </a>
                     <a href="{{ route('ai.generate.form') }}" class="btn btn-gradient text-start py-3 px-3 card-hover text-white">
-                        <i class="fa-solid fa-wand-magic-sparkles me-2"></i> Tự động tạo câu hỏi bằng AI (RAG)
+                        <i class="fa-solid fa-wand-magic-sparkles me-2"></i> Tự động tạo câu hỏi bằng AI
                     </a>
                 </div>
             </div>

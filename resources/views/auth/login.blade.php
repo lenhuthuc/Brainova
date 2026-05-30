@@ -34,6 +34,7 @@
                         <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
                         <label class="form-check-label text-muted" for="remember">Ghi nhớ đăng nhập</label>
                     </div>
+                    <a href="{{ route('password.request') }}" class="text-primary text-decoration-none small fw-medium">Quên mật khẩu?</a>
                 </div>
 
                 <div class="d-grid mb-3">

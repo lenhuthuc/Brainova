@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="mb-4">
-    <h2 class="fw-bold"><i class="fa-solid fa-wand-magic-sparkles text-primary me-2"></i>AI Question Generator (RAG)</h2>
+    <h2 class="fw-bold"><i class="fa-solid fa-wand-magic-sparkles text-primary me-2"></i>AI Question Generator</h2>
     <p class="text-muted">Sinh câu hỏi trắc nghiệm tự động từ nội dung tài liệu học tập của bạn bằng AI</p>
 </div>
 
@@ -83,7 +83,7 @@
 
             <div class="text-center mt-4 d-none" id="loadingArea">
                 <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
-                <h6 class="fw-bold">RAG AI đang xử lý tài liệu...</h6>
+                <h6 class="fw-bold">AI đang xử lý tài liệu...</h6>
                 <p class="text-muted small">Thời gian xử lý có thể kéo dài từ 10-30 giây tùy theo kích thước tệp và API kết nối.</p>
             </div>
         </div>
@@ -155,7 +155,7 @@
                 <div class="text-center py-5">
                     <i class="fa-solid fa-wand-magic-sparkles text-muted fa-4x mb-4"></i>
                     <h6 class="text-muted">Chưa có dữ liệu xem trước nào.</h6>
-                    <p class="text-muted small px-4">Sau khi cấu hình và nhấn nút sinh câu hỏi, kết quả trích xuất cấu trúc RAG từ mô hình ngôn ngữ (Gemini/OpenAI) sẽ hiển thị chi tiết tại đây để bạn kiểm tra lại trước khi lưu.</p>
+                    <p class="text-muted small px-4">Bạn có thể xem trước câu hỏi ở đây trước khi lưu</p>
                 </div>
             @endif
         </div>
