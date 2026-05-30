@@ -68,7 +68,7 @@ class RagConversation extends Model
     /**
      * Get the messages in this conversation.
      */
-    public function messages(): HasMany
+    public function ragMessages(): HasMany
     {
         return $this->hasMany(RagMessage::class);
     }

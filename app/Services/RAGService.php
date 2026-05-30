@@ -45,9 +45,24 @@ class RAGService
 
     /**
      * Process a user's question and return the AI assistant's response.
+     *
+     * @return array{answer: string, conversation_id: int}
      */
-    public function askQuestion(RagConversation $conversation, string $question): RagMessage
+    public function askQuestion(User $user, Attempt $attempt, string $question, ?int $conversationId = null): array
     {
+        $conversation = null;
+
+        if ($conversationId !== null) {
+            $conversation = RagConversation::where('id', $conversationId)
+                ->where('attempt_id', $attempt->id)
+                ->where('user_id', $user->id)
+                ->first();
+        }
+
+        if (! $conversation) {
+            $conversation = $this->getOrCreateConversation($user, $attempt);
+        }
+
         // 1. Save the user's message
         $conversation->ragMessages()->create([
             'role' => 'user',
@@ -68,10 +83,15 @@ class RAGService
         }
 
         // 6-7. Save and return the assistant's response
-        return $conversation->ragMessages()->create([
+        $assistantMessage = $conversation->ragMessages()->create([
             'role' => 'assistant',
             'content' => $aiResponse,
         ]);
+
+        return [
+            'answer' => $assistantMessage->content,
+            'conversation_id' => $conversation->id,
+        ];
     }
 
     /**
@@ -278,20 +298,20 @@ class RAGService
         }
 
         $attempt->load([
-            'attemptDetails' => fn ($query) => $query->where('is_correct', false),
-            'attemptDetails.question',
-            'attemptDetails.question.answers' => fn ($query) => $query->where('is_correct', true),
-            'attemptDetails.answer',
+            'details' => fn ($query) => $query->where('is_correct', false),
+            'details.question',
+            'details.question.answers' => fn ($query) => $query->where('is_correct', true),
+            'details.answer',
         ]);
 
-        if ($attempt->attemptDetails->isEmpty()) {
+        if ($attempt->details->isEmpty()) {
             return 'The student answered all questions correctly. Score: ' . $attempt->score . '/' . $attempt->total_points;
         }
 
         $context = "Student's Quiz Results (Score: {$attempt->score}/{$attempt->total_points}):\n\n";
         $context .= "Questions answered INCORRECTLY:\n";
 
-        foreach ($attempt->attemptDetails as $index => $detail) {
+        foreach ($attempt->details as $index => $detail) {
             $number = $index + 1;
             $question = $detail->question;
 

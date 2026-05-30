@@ -70,7 +70,7 @@ class AttemptService
                 }
                 // short_answer: mark as needs review (is_correct = false, points_earned = 0)
 
-                $attempt->attemptDetails()->create([
+                $attempt->details()->create([
                     'question_id' => $questionId,
                     'answer_id' => $answerId,
                     'text_answer' => $textAnswer,
@@ -96,9 +96,9 @@ class AttemptService
     public function getAttemptWithDetails(Attempt $attempt): Attempt
     {
         return $attempt->load([
-            'attemptDetails.question',
-            'attemptDetails.answer',
-            'attemptDetails.question.answers' => fn ($query) => $query->orderBy('sort_order'),
+            'details.question',
+            'details.answer',
+            'details.question.answers' => fn ($query) => $query->orderBy('sort_order'),
         ]);
     }
 

@@ -33,6 +33,7 @@
                 <div class="mb-3">
                     <label for="role" class="form-label font-medium">Bạn là</label>
                     <select name="role" id="role" class="form-select @error('role') is-invalid @enderror" required>
+                        <option value="" disabled {{ old('role') ? '' : 'selected' }}>-- Chọn vai trò --</option>
                         <option value="student" {{ old('role') === 'student' ? 'selected' : '' }}>Học Sinh (Làm trắc nghiệm & hỏi đáp AI)</option>
                         <option value="teacher" {{ old('role') === 'teacher' ? 'selected' : '' }}>Giáo Viên (Tạo Quiz & upload tài liệu AI)</option>
                     </select>

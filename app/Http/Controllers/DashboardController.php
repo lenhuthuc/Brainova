@@ -32,6 +32,9 @@ class DashboardController extends Controller
                 $query->where('user_id', $user->id);
             })->count();
             $documentCount = Document::where('user_id', $user->id)->count();
+            $attemptCount = Attempt::whereHas('quiz', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })->count();
             $recentAttempts = Attempt::whereHas('quiz', function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             })
@@ -44,6 +47,7 @@ class DashboardController extends Controller
                 'quizCount',
                 'questionCount',
                 'documentCount',
+                'attemptCount',
                 'recentAttempts',
             ));
         }
@@ -59,8 +63,19 @@ class DashboardController extends Controller
             ->take(10)
             ->get();
 
+        $availableQuizzesCount = $availableQuizzes->count();
+        $recentQuizzes = $availableQuizzes->take(5);
+        $recentAttemptsStudent = $recentAttempts;
+        $attemptsCount = $recentAttempts->count();
+        $averageScore = $recentAttempts->avg('score') ?? 0;
+
         return view('dashboard.index', compact(
             'availableQuizzes',
+            'availableQuizzesCount',
+            'recentQuizzes',
+            'recentAttemptsStudent',
+            'attemptsCount',
+            'averageScore',
             'recentAttempts',
         ));
     }

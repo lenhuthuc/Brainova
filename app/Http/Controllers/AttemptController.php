@@ -60,7 +60,7 @@ class AttemptController extends Controller
                 ->with('info', 'You already have an active attempt for this quiz.');
         }
 
-        $attempt = $this->attemptService->startAttempt($quiz, $user);
+        $attempt = $this->attemptService->startAttempt($user, $quiz);
 
         return redirect()
             ->route('attempts.take', $attempt)
@@ -85,8 +85,8 @@ class AttemptController extends Controller
         }
 
         $attempt->load('quiz.questions.answers');
-
-        return view('attempts.take', compact('attempt'));
+        $quiz = $attempt->quiz;
+        return view('attempts.take', compact('attempt', 'quiz'));
     }
 
     /**

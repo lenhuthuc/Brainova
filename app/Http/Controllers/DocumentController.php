@@ -52,9 +52,9 @@ class DocumentController extends Controller
     public function store(UploadDocumentRequest $request): RedirectResponse
     {
         $this->documentService->uploadDocument(
-            $request->validated(),
-            $request->file('file'),
             $request->user(),
+            $request->file('file'),
+            $request->validated()['title'],
         );
 
         return redirect()

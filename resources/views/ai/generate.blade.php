@@ -97,8 +97,12 @@
             @if(isset($generatedQuestions) && count($generatedQuestions) > 0)
                 <form action="{{ route('ai.generate.save') }}" method="POST">
                     @csrf
-                    <input type="hidden" name="quiz_id" value="{{ $quizId }}">
-                    
+                    <input type="hidden" name="quiz_id" value="{{ $quiz->id }}">
+
+                    <div class="alert alert-info py-2 px-3 mb-3 small">
+                        <i class="fa-solid fa-folder-open me-1"></i> Lưu vào quiz: <strong>{{ $quiz->title }}</strong>
+                    </div>
+
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="selectAllCheckbox" checked>

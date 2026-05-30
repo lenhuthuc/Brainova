@@ -36,20 +36,13 @@ class RAGController extends Controller
         $user = $request->user();
 
         // Get or create the conversation for this attempt
-        $conversation = RagConversation::firstOrCreate(
-            [
-                'user_id' => $user->id,
-                'attempt_id' => $attempt->id,
-            ],
-            [
-                'document_id' => null,
-            ],
-        );
+        $conversation = $this->ragService->getOrCreateConversation($user, $attempt);
 
         // Load conversation messages
-        $conversation->load('messages');
+        $conversation->load('ragMessages');
+        $messages = $conversation->ragMessages;
 
-        return view('rag.chat', compact('attempt', 'conversation'));
+        return view('rag.chat', compact('attempt', 'conversation', 'messages'));
     }
 
     /**

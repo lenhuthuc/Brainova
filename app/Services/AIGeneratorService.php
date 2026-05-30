@@ -24,23 +24,33 @@ class AIGeneratorService
         string $questionType = 'multiple_choice',
         string $difficulty = 'medium'
     ): array {
+        $provider = config('services.ai.provider', 'gemini');
+
         try {
-            // If content is too long, chunk it and use the first chunk
-            if (mb_strlen($documentContent) > 8000) {
-                $chunks = $this->chunkContent($documentContent, 8000);
-                $documentContent = $chunks[0] ?? $documentContent;
+            $chunks = mb_strlen($documentContent) <= 8000
+                ? [$documentContent]
+                : $this->chunkContent($documentContent, 8000);
+
+            // Limit chunks to at most $numberOfQuestions (1 question minimum per chunk)
+            $chunks = array_slice($chunks, 0, $numberOfQuestions);
+            $chunkCount = count($chunks);
+            $questionsPerChunk = (int) ceil($numberOfQuestions / $chunkCount);
+
+            $allQuestions = [];
+
+            foreach ($chunks as $chunk) {
+                $prompt = $this->buildPrompt($chunk, $questionsPerChunk, $questionType, $difficulty);
+
+                $response = match ($provider) {
+                    'openai' => $this->callOpenAI($prompt),
+                    default => $this->callGemini($prompt),
+                };
+
+                $questions = $this->parseResponse($response);
+                $allQuestions = array_merge($allQuestions, $questions);
             }
 
-            $prompt = $this->buildPrompt($documentContent, $numberOfQuestions, $questionType, $difficulty);
-
-            $provider = config('services.ai.provider', 'gemini');
-
-            $response = match ($provider) {
-                'openai' => $this->callOpenAI($prompt),
-                default => $this->callGemini($prompt),
-            };
-
-            $questions = $this->parseResponse($response);
+            $questions = array_slice($allQuestions, 0, $numberOfQuestions);
 
             if (empty($questions)) {
                 Log::warning('AI returned empty question set.', [
@@ -53,13 +63,21 @@ class AIGeneratorService
             }
 
             return $questions;
+        } catch (\RuntimeException $e) {
+            Log::error('AI question generation failed.', [
+                'provider' => $provider,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw $e;
         } catch (\Throwable $e) {
-            Log::error('Failed to generate questions via AI.', [
+            Log::error('Unexpected error during AI question generation.', [
+                'provider' => $provider,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            return [];
+            throw new \RuntimeException('Lỗi không xác định khi gọi AI: ' . $e->getMessage(), 0, $e);
         }
     }
 
@@ -149,15 +167,44 @@ PROMPT;
         ]);
 
         if ($response->failed()) {
+            $status = $response->status();
+            $body = $response->json() ?? [];
+
+            if ($status === 429) {
+                $retryDelay = data_get($body, 'error.details.2.retryDelay', '60s');
+                Log::warning('Gemini API rate limit / quota exceeded.', [
+                    'model' => $model,
+                    'http_status' => $status,
+                    'retry_delay' => $retryDelay,
+                    'violations' => data_get($body, 'error.details.1.violations', []),
+                ]);
+                throw new \RuntimeException(
+                    "Gemini API vượt quá giới hạn quota (free tier). Vui lòng thử lại sau {$retryDelay}."
+                );
+            }
+
+            Log::error('Gemini API request failed.', [
+                'model' => $model,
+                'http_status' => $status,
+                'response_body' => $response->body(),
+            ]);
+
             throw new \RuntimeException(
-                'Gemini API request failed: ' . $response->status() . ' - ' . $response->body()
+                "Gemini API trả về lỗi HTTP {$status}: " . $response->body()
             );
         }
 
         $result = $response->json();
 
-        return $result['candidates'][0]['content']['parts'][0]['text']
-            ?? throw new \RuntimeException('Unexpected Gemini response structure.');
+        if (! isset($result['candidates'][0]['content']['parts'][0]['text'])) {
+            Log::error('Unexpected Gemini response structure.', [
+                'model' => $model,
+                'response' => $result,
+            ]);
+            throw new \RuntimeException('Cấu trúc phản hồi từ Gemini không hợp lệ.');
+        }
+
+        return $result['candidates'][0]['content']['parts'][0]['text'];
     }
 
     /**
@@ -193,15 +240,42 @@ PROMPT;
             ]);
 
         if ($response->failed()) {
+            $status = $response->status();
+
+            if ($status === 429) {
+                $retryAfter = $response->header('Retry-After') ?? '60';
+                Log::warning('OpenAI API rate limit exceeded.', [
+                    'model' => $model,
+                    'http_status' => $status,
+                    'retry_after' => $retryAfter,
+                ]);
+                throw new \RuntimeException(
+                    "OpenAI API vượt quá giới hạn quota. Vui lòng thử lại sau {$retryAfter} giây."
+                );
+            }
+
+            Log::error('OpenAI API request failed.', [
+                'model' => $model,
+                'http_status' => $status,
+                'response_body' => $response->body(),
+            ]);
+
             throw new \RuntimeException(
-                'OpenAI API request failed: ' . $response->status() . ' - ' . $response->body()
+                "OpenAI API trả về lỗi HTTP {$status}: " . $response->body()
             );
         }
 
         $result = $response->json();
 
-        return $result['choices'][0]['message']['content']
-            ?? throw new \RuntimeException('Unexpected OpenAI response structure.');
+        if (! isset($result['choices'][0]['message']['content'])) {
+            Log::error('Unexpected OpenAI response structure.', [
+                'model' => $model,
+                'response' => $result,
+            ]);
+            throw new \RuntimeException('Cấu trúc phản hồi từ OpenAI không hợp lệ.');
+        }
+
+        return $result['choices'][0]['message']['content'];
     }
 
     /**
