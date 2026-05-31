@@ -62,17 +62,11 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        dd('role from request: ' . ($data['role'] ?? 'NULL'));
-
-        $user = User::create([
+        return User::create([
             'name' => $data['name'],
             'role' => $data['role'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
-
-        dd('role saved in DB: ' . $user->fresh()->role);
-
-        return $user;
     }
 }

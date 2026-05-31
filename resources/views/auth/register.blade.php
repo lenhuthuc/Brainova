@@ -8,7 +8,7 @@
         <div class="card card-custom p-4 shadow-sm">
             <div class="text-center mb-4">
                 <h3 class="fw-bold text-primary">Tạo tài khoản mới</h3>
-                <p class="text-muted">Bắt đầu học tập và kiểm tra với sự trợ giúp của RAG AI</p>
+                <p class="text-muted">Bắt đầu học tập và kiểm tra với sự trợ giúp của AI</p>
             </div>
             
             <form action="{{ route('register') }}" method="POST">
@@ -34,8 +34,8 @@
                     <label for="role" class="form-label font-medium">Bạn là</label>
                     <select name="role" id="role" class="form-select @error('role') is-invalid @enderror" required>
                         <option value="" disabled {{ old('role') ? '' : 'selected' }}>-- Chọn vai trò --</option>
-                        <option value="student" {{ old('role') === 'student' ? 'selected' : '' }}>Học Sinh (Làm trắc nghiệm & hỏi đáp AI)</option>
-                        <option value="teacher" {{ old('role') === 'teacher' ? 'selected' : '' }}>Giáo Viên (Tạo Quiz & upload tài liệu AI)</option>
+                        <option value="student" {{ old('role') === 'student' ? 'selected' : '' }}>Học Sinh</option>
+                        <option value="teacher" {{ old('role') === 'teacher' ? 'selected' : '' }}>Giáo Viên</option>
                     </select>
                     @error('role')
                         <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>

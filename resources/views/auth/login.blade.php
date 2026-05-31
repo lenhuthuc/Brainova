@@ -8,7 +8,7 @@
         <div class="card card-custom p-4 shadow-sm">
             <div class="text-center mb-4">
                 <h3 class="fw-bold text-primary">Chào mừng quay lại</h3>
-                <p class="text-muted">Đăng nhập vào tài khoản QuizMaster của bạn</p>
+                <p class="text-muted">Đăng nhập vào tài khoản Brainova của bạn</p>
             </div>
             
             <form action="{{ route('login') }}" method="POST">

@@ -59,17 +59,27 @@
                             <i class="fa-solid fa-plus-circle me-1"></i> Thêm phương án
                         </button>
                     </div>
-                    
+
                     <div class="alert alert-warning border-0 small mb-3 shadow-none" id="tfWarning" style="display:none;">
                         <i class="fa-solid fa-exclamation-triangle me-2"></i> Đối với câu hỏi Đúng/Sai, hệ thống sẽ tự động khởi tạo 2 đáp án: "Đúng" và "Sai".
                     </div>
-                    
+
                     <div id="answersList">
                         <!-- Dynamic Answers will be appended here -->
                     </div>
                     @error('answers')
                         <div class="text-danger small mt-2"><strong>{{ $message }}</strong></div>
                     @enderror
+                </div>
+
+                <!-- Short Answer Reference Container -->
+                <div id="shortAnswerContainer" class="mb-4" style="display:none;">
+                    <label class="form-label fw-bold">Đáp án mẫu <span class="text-muted fw-normal">(tùy chọn)</span></label>
+                    <div class="alert alert-info border-0 small mb-3 shadow-none">
+                        <i class="fa-solid fa-circle-info me-2"></i> Nhập đáp án mẫu để học sinh tham khảo sau khi nộp bài. Câu tự luận sẽ được chấm thủ công.
+                    </div>
+                    <textarea name="answers[0][content]" id="shortAnswerText" class="form-control" rows="3" placeholder="Nhập đáp án mẫu tham khảo...">{{ old('answers.0.content') }}</textarea>
+                    <input type="hidden" name="answers[0][is_correct]" value="1">
                 </div>
 
                 <div class="mb-4">
@@ -96,6 +106,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const typeSelect = document.getElementById('type');
     const answersContainer = document.getElementById('answersContainer');
+    const shortAnswerContainer = document.getElementById('shortAnswerContainer');
     const answersList = document.getElementById('answersList');
     const addAnswerBtn = document.getElementById('addAnswerBtn');
     const tfWarning = document.getElementById('tfWarning');
@@ -153,6 +164,8 @@ document.addEventListener('DOMContentLoaded', function () {
         answerIndex = 0;
         const type = typeSelect.value;
 
+        shortAnswerContainer.style.display = 'none';
+
         if (type === 'multiple_choice') {
             answersContainer.style.display = 'block';
             addAnswerBtn.style.display = 'inline-block';
@@ -172,6 +185,7 @@ document.addEventListener('DOMContentLoaded', function () {
             addAnswerRow('Sai', false, true);
         } else {
             answersContainer.style.display = 'none';
+            shortAnswerContainer.style.display = 'block';
         }
     }
 

@@ -34,7 +34,7 @@ class StoreQuestionRequest extends FormRequest
             'type' => 'required|in:multiple_choice,true_false,short_answer',
             'points' => 'required|integer|min:1|max:100',
             'explanation' => 'nullable|string',
-            'answers' => 'required_unless:type,short_answer|array|min:2',
+            'answers' => array_filter(['required_unless:type,short_answer', 'nullable', 'array', $this->input('type') !== 'short_answer' ? 'min:2' : null]),
             'answers.*.content' => 'required_with:answers|string',
             'answers.*.is_correct' => 'required_with:answers|boolean',
         ];
