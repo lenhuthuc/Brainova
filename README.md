@@ -51,6 +51,54 @@ Brainova hỗ trợ:
 
 ## Hướng dẫn cài đặt
 
+### Chạy bằng Docker (khuyến nghị)
+
+Yêu cầu: [Docker](https://www.docker.com/get-started) và [Docker Compose](https://docs.docker.com/compose/install/) đã được cài đặt.
+
+1. Sao chép kho lưu trữ:
+   ```bash
+   git clone <repository-url> Brainova
+   cd Brainova
+   ```
+
+2. Tạo file cấu hình môi trường:
+   ```bash
+   cp .env.example .env
+   ```
+
+3. Cập nhật `.env` để dùng MySQL trong Docker:
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=mysql
+   DB_PORT=3306
+   DB_DATABASE=laravel
+   DB_USERNAME=laravel
+   DB_PASSWORD=secret
+   DB_ROOT_PASSWORD=root
+   ```
+
+4. Khởi động toàn bộ hệ thống:
+   ```bash
+   docker compose up -d --build
+   ```
+
+5. Sinh APP_KEY và chạy migration:
+   ```bash
+   docker compose exec app php artisan key:generate
+   docker compose exec app php artisan migrate --seed
+   ```
+
+6. Truy cập ứng dụng:
+   - **Web app**: [http://localhost:9090](http://localhost:9090)
+   - **phpMyAdmin**: [http://localhost:8080](http://localhost:8080)
+
+> Để dừng: `docker compose down`  
+> Để dừng và xóa toàn bộ dữ liệu: `docker compose down -v`
+
+---
+
+### Chạy thủ công (không dùng Docker)
+
 1. Sao chép kho lưu trữ vào máy:
    ```powershell
    git clone <repository-url> Brainova
